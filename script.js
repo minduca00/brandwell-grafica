@@ -178,7 +178,7 @@
     if (e.key === "Escape") closeLightbox();
   });
 
-  // ---------- Reveal on scroll ----------
+// ---------- Reveal on scroll ----------
   var revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
@@ -192,5 +192,139 @@
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  // ============================================================
+  // Efeitos adicionais — PC + Mobile
+  // ============================================================
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Barra de progresso de rolagem ----------
+  var scrollProgress = document.getElementById("scrollProgress");
+
+  // ---------- Botão voltar ao topo ----------
+  var toTop = document.getElementById("toTop");
+  if (toTop) {
+    toTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    });
+  }
+
+  function onScrollFX() {
+    var scrolled = window.scrollY;
+    var total = document.documentElement.scrollHeight - window.innerHeight;
+    // Barra de progresso
+    if (scrollProgress && total > 0) {
+      scrollProgress.style.width = (scrolled / total) * 100 + "%";
+    }
+    // Botão voltar ao topo
+    if (toTop) {
+      if (scrolled > 500) toTop.classList.add("show");
+      else toTop.classList.remove("show");
+    }
+  }
+  document.addEventListener("scroll", onScrollFX, { passive: true });
+  onScrollFX();
+
+  // ---------- Cursor spotlight (desktop) ---------- 
+  var finePointer = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+  var cursorGlow = null;
+  if (finePointer && !reduceMotion) {
+    cursorGlow = document.createElement("div");
+    cursorGlow.className = "cursor-glow";
+    document.body.appendChild(cursorGlow);
+    var glowTimer;
+    document.addEventListener("mousemove", function (e) {
+      cursorGlow.style.left = e.clientX + "px";
+      cursorGlow.style.top = e.clientY + "px";
+      cursorGlow.classList.add("on");
+      clearTimeout(glowTimer);
+      glowTimer = setTimeout(function () {
+        cursorGlow.classList.remove("on");
+      }, 1600);
+    }, { passive: true });
+  }
+
+  // ---------- Sparkles no clique em botões ----------
+  function spawnSparks(x, y) {
+    if (reduceMotion) return;
+    var colors = ["#E4C877", "#C9A227", "#FFFFFF"];
+    for (var i = 0; i < 8; i++) {
+      var s = document.createElement("span");
+      s.className = "spark";
+      s.style.left = x + "px";
+      s.style.top = y + "px";
+      s.style.background = colors[i % colors.length];
+      var angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.5;
+      var dist = 40 + Math.random() * 50;
+      s.style.setProperty("--tx", Math.cos(angle) * dist + "px");
+      s.style.setProperty("--ty", Math.sin(angle) * dist + "px");
+      document.body.appendChild(s);
+      setTimeout(function (el) { el.remove(); }, 750, s);
+    }
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("a, button");
+    if (t) spawnSparks(e.clientX, e.clientY);
+  });
+
+  // ---------- Tilt sutil nos cards (desktop) ----------
+  if (finePointer && !reduceMotion) {
+    document.querySelectorAll(".product-card, .review-card").forEach(function (card) {
+      card.addEventListener("mousemove", function (e) {
+        var r = card.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width - 0.5;
+        var py = (e.clientY - r.top) / r.height - 0.5;
+        card.classList.add("tilt");
+        card.style.transform = "perspective(700px) rotateY(" + (px * 8) + "deg) rotateX(" + (-py * 8) + "deg)";
+      });
+      card.addEventListener("mouseleave", function () {
+        card.classList.remove("tilt");
+        card.style.transform = "";
+      });
+    });
+  }
+
+// ---------- Contador animado ----------
+  // Anima o texto para: "5,0" em ".reviews-score-number"
+  // e o número ("74") em ".reviews-score-count"
+  function animateNumber(el, target, decimals, suffix) {
+    var start = null;
+    var dur = 1400;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var val = (target * eased).toFixed(decimals);
+      el.textContent = val.replace(".", ",") + suffix;
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  var scoreNum = document.querySelector(".reviews-score-number");
+  var scoreText = document.querySelector(".reviews-score-count");
+  var countDone = false;
+
+  if (scoreNum && !reduceMotion) {
+    // Guarda o valor final original ("5,0")
+    var scoreTarget = parseFloat(scoreNum.textContent.replace(",", ".")) || 5;
+    // Extrai o número de avaliações e o texto ao redor ("74 avaliações no Google")
+    var countMatch = scoreText ? scoreText.textContent.match(/(\d+)(.*)/) : null;
+    var reviewsTotal = countMatch ? parseInt(countMatch[1], 10) : 74;
+    var reviewsSuffix = countMatch ? countMatch[2] : " avaliações no Google";
+
+    var ioCount = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !countDone) {
+          countDone = true;
+animateNumber(scoreNum, scoreTarget, 1, "");
+          if (scoreText) animateNumber(scoreText, reviewsTotal, 0, reviewsSuffix);
+          ioCount.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    ioCount.observe(scoreNum);
   }
 })();

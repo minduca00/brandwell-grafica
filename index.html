@@ -14,6 +14,9 @@
 </head>
 <body>
 
+<!-- Barra de progresso de rolagem -->
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
 <!-- ============ HEADER ============ -->
 <header class="site-header" id="siteHeader">
   <div class="wrap header-inner">
@@ -67,15 +70,15 @@
   <section class="hero">
     <div class="hero-texture" aria-hidden="true"></div>
     <div class="wrap hero-inner">
-      <div class="hero-copy reveal">
-        <p class="eyebrow eyebrow-light">Gráfica Rápida · Boa Viagem, Recife</p>
-        <h1 class="hero-title">Impressão que faz<br>sua marca ser vista.</h1>
-        <p class="hero-sub">Cuidamos de tudo o que a sua marca precisa para aparecer com estilo. Crachás profissionais, cartões de visita, adesivos, sacolas e canecas personalizadas. A gente imprime, você impressiona, e a entrega chega rapidinho até você.</p>
-        <div class="hero-ctas">
+<div class="hero-copy reveal">
+        <p class="eyebrow eyebrow-light hero-stagger" style="--o:0">Gráfica Rápida · Boa Viagem, Recife</p>
+        <h1 class="hero-title hero-stagger" style="--o:1">Impressão que faz<br>sua marca ser vista.</h1>
+        <p class="hero-sub hero-stagger" style="--o:2">Cuidamos de tudo o que a sua marca precisa para aparecer com estilo. Crachás profissionais, cartões de visita, adesivos, sacolas e canecas personalizadas. A gente imprime, você impressiona, e a entrega chega rapidinho até você.</p>
+        <div class="hero-ctas hero-stagger" style="--o:3">
           <a href="#" class="btn btn-gold" id="heroCtaPrimary" target="_blank" rel="noopener">Pedir orçamento</a>
           <a href="#produtos" class="btn btn-outline-light">Ver produtos</a>
         </div>
-        <div class="hero-meta">
+        <div class="hero-meta hero-stagger" style="--o:4">
           <div class="hero-meta-item">
             <span class="stars" aria-hidden="true">★★★★★</span>
             <span>5,0 · 74 avaliações no Google</span>
@@ -439,6 +442,9 @@
   <button class="lightbox-close" id="lightboxClose" aria-label="Fechar">&times;</button>
   <img id="lightboxImg" src="" alt="">
 </div>
+
+<!-- Botão voltar ao topo -->
+<button class="to-top" id="toTop" aria-label="Voltar ao topo">↑</button>
 
 <script src="script.js"></script>
 </body>

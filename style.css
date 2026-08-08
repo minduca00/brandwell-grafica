@@ -663,7 +663,129 @@ button{ font-family:inherit; cursor:pointer; }
   .gallery-item-big{ grid-column:span 2; grid-row:span 1; }
   .gallery-item-tall{ grid-row:span 1; }
 
-  .quote-form{ grid-template-columns:1fr; }
+.quote-form{ grid-template-columns:1fr; }
   .section, .section-alt{ padding:64px 0; }
   .narrative{ padding:64px 0; }
+}
+
+/* =========================================================
+   Efeitos adicionais — PC + Mobile
+========================================================= */
+
+/* ---------- Barra de progresso de rolagem ---------- */
+.scroll-progress{
+  position:fixed; top:0; left:0; z-index:400;
+  height:3px; width:0%;
+  background:linear-gradient(90deg, var(--gold), var(--gold-light));
+  box-shadow:0 0 12px rgba(201,162,39,.6);
+  pointer-events:none;
+}
+
+/* ---------- Botão voltar ao topo ---------- */
+.to-top{
+  position:fixed; right:22px; bottom:96px; z-index:200;
+  width:46px; height:46px; border-radius:50%;
+  border:1px solid var(--gold);
+  background:var(--ink); color:var(--gold-light);
+  font-size:20px; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transform:translateY(16px); pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease, background .25s ease, color .25s ease;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+.to-top.show{ opacity:1; transform:none; pointer-events:auto; }
+.to-top:hover{ background:var(--gold); color:var(--ink); }
+
+/* ---------- Stagger de entrada do hero ---------- */
+.hero-stagger{ opacity:0; transform:translateY(24px); }
+.hero-copy.in .hero-stagger{
+  animation:heroIn .7s cubic-bezier(.22,.61,.36,1) forwards;
+  animation-delay:calc(var(--o,0) * .12s);
+}
+@keyframes heroIn{ to{ opacity:1; transform:none; } }
+
+/* ---------- Variantes de reveal (esquerda/direita) ---------- */
+.reveal-left{ opacity:0; transform:translateX(-40px); }
+.reveal-left.in{ opacity:1; transform:none; }
+.reveal-right{ opacity:0; transform:translateX(40px); }
+.reveal-right.in{ opacity:1; transform:none; }
+.reveal-left, .reveal-right{ transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1); }
+
+/* ---------- Brilho de varredura (shine) nos cards ---------- */
+.product-card, .review-card{ position:relative; overflow:hidden; }
+.product-card::before, .review-card::before{
+  content:"";
+  position:absolute; top:0; left:-120%;
+  width:60%; height:100%;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.55), transparent);
+  transform:skewX(-20deg);
+  opacity:0;
+  pointer-events:none;
+  z-index:2;
+}
+.product-card:hover::before, .review-card:hover::before{ opacity:1; animation:shine 1s ease; }
+@keyframes shine{ to{ left:130%; } }
+
+/* ---------- Tilt sutil nos cards (desktop) ---------- */
+@media (hover:hover) and (pointer:fine){
+  .product-card, .review-card{
+    transform-style:preserve-3d;
+    will-change:transform;
+  }
+  .product-card.tilt, .review-card.tilt{ transition:transform .12s ease; }
+}
+
+/* ---------- Focus animado nos inputs ---------- */
+.field input, .field textarea{
+  transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.field input:focus, .field textarea:focus{
+  box-shadow:0 0 0 0 rgba(201,162,39,.35);
+  animation:inputGlow 1.6s ease-in-out infinite;
+}
+@keyframes inputGlow{
+  0%,100%{ box-shadow:0 0 0 1px var(--gold), 0 0 0 3px rgba(201,162,39,.15); }
+  50%{ box-shadow:0 0 0 1px var(--gold), 0 0 0 7px rgba(201,162,39,.08); }
+}
+
+/* ---------- Cursor spotlight (desktop) ---------- */
+.cursor-glow{
+  position:fixed; top:0; left:0; z-index:999;
+  width:480px; height:480px;
+  margin-left:-240px; margin-top:-240px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(201,162,39,.10), transparent 60%);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .4s ease;
+}
+.cursor-glow.on{ opacity:1; }
+@media (hover:none), (pointer:coarse), (max-width:760px){
+  .cursor-glow{ display:none; }
+}
+
+/* ---------- Sparkles no clique em botões ---------- */
+.spark{
+  position:fixed; z-index:1000; pointer-events:none;
+  width:5px; height:5px; border-radius:50%;
+  background:var(--gold-light);
+  box-shadow:0 0 6px var(--gold);
+  animation:sparkFly .7s ease-out forwards;
+}
+@keyframes sparkFly{
+  0%{ opacity:1; transform:translate(0,0) scale(1); }
+  100%{ opacity:0; transform:translate(var(--tx),var(--ty)) scale(.2); }
+}
+
+/* ---------- Contador animado ---------- */
+.reviews-score-number{ display:inline-block; }
+
+/* ---------- Reduced motion para os novos efeitos ---------- */
+@media (prefers-reduced-motion: reduce){
+  .hero-stagger{ opacity:1; transform:none; animation:none; }
+  .scroll-progress{ transition:none; }
+  .to-top{ transition:none; }
+  .product-card::before, .review-card::before{ animation:none; }
+  .field input:focus, .field textarea:focus{ animation:none; }
+  .cursor-glow{ display:none; }
 }
