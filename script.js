@@ -70,19 +70,21 @@
   document.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  // ---------- Mobile nav ----------
+// ---------- Mobile nav ----------
   var navToggle = document.getElementById("navToggle");
   var mainNav = document.getElementById("mainNav");
-  navToggle.addEventListener("click", function () {
-    var open = mainNav.classList.toggle("open");
-    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-  mainNav.querySelectorAll("a").forEach(function (a) {
-    a.addEventListener("click", function () {
-      mainNav.classList.remove("open");
-      navToggle.setAttribute("aria-expanded", "false");
+  if (navToggle && mainNav) {
+    navToggle.addEventListener("click", function () {
+      var open = mainNav.classList.toggle("open");
+      navToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
-  });
+    mainNav.querySelectorAll("a").forEach(function (a) {
+      a.addEventListener("click", function () {
+        mainNav.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
 
   // ---------- Generic carousel (scroll-snap + arrows + dots + drag) ----------
   function initCarousel(trackId, prevId, nextId, dotsId, itemSelector) {
